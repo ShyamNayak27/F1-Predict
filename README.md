@@ -3,8 +3,7 @@
 A multi-task Gradient Boosting Machine (GBM) ensembled predictor that forecasts Formula 1 Grand Prix outcomes using weather forecasts, practice pace telemetry, and historical results.
 
 <div align="center">
-  <!-- Place your intro video URL or relative path inside this HTML video player -->
-  <video src="intro_showcase.mp4" width="100%" autoplay loop muted controls poster="dashboard/style.css"></video>
+  <video src="https://github.com/user-attachments/assets/969806df-d35f-46f3-b656-454b3b9320d9" width="100%" autoplay loop muted controls></video>
 </div>
 
 ---
@@ -114,3 +113,21 @@ python -m http.server 5501
 python -m http.server 5500 --directory dashboard
 ```
 *(On Vercel, the project is deployed as a single project serving root `/` and `/dashboard/` without requiring any background servers).*
+
+---
+
+## 5. Contact, License & Acknowledgements
+
+### Contact Me
+*   **Shyam Narayan Nayak**
+*   **GitHub**: [@ShyamNayak27](https://github.com/ShyamNayak27)
+*   **LinkedIn**: [Shyam Narayan Nayak](https://www.linkedin.com/in/shyamnnayak/)
+*   **Email**: [shtrillion@gmail.com](mailto:shtrillion@gmail.com)
+
+### License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+### Acknowledgements
+*   [FastF1](https://github.com/theOehrly/Fast-F1) for practice telemetry and timing database access.
+*   [Jolpica-Ergast F1 API](https://api.jolpi.ca/ergast/f1/) for schedules, qualifying, and race weekend results.
+*   [OpenWeatherMap API](https://openweathermap.org/) for live weather forecasts.

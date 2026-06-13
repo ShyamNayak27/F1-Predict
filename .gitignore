@@ -7,3 +7,5 @@ model/historical_data.joblib
 model/enriched_data.joblib
 *.joblib
 .pytest_cache/
+.gemini/
+

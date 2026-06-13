@@ -3,7 +3,7 @@
 A multi-task Gradient Boosting Machine (GBM) ensembled predictor that forecasts Formula 1 Grand Prix outcomes using weather forecasts, practice pace telemetry, and historical results.
 
 <div align="center">
-  <video src="https://github.com/user-attachments/assets/969806df-d35f-46f3-b656-454b3b9320d9" width="100%" autoplay loop muted controls></video>
+  <video src="https://github.com/user-attachments/assets/e92e0b88-7dfa-495a-be41-f63a186fd7a1></video>
 </div>
 
 ---

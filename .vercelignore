@@ -1,0 +1,16 @@
+# Ignore Python scripts and dependencies on Vercel deployment
+*.py
+data/
+features/
+model/
+tests/
+Main_Prediction_Script/
+requirements.txt
+.env
+.pytest_cache/
+cache/
+config.py
+test_run.py
+test_run.log
+run_out.log
+run_out_cmd.log

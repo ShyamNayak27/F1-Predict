@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+cache/
+model/trained_model.joblib
+model/historical_data.joblib
+model/enriched_data.joblib
+*.joblib
+.pytest_cache/

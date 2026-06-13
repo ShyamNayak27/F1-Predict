@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 Predict — Telemetry-Driven 2026 Predictions</title>
+  <meta name="description" content="Cinematic interactive 3D showcase of F1 Predict. Blending physical models, telemetry, and machine learning to call winners." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── LOADING OVERLAY ── -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner"></div>
+    <div class="loading-text" id="loadingPercent">Loading F1 Model (0%)</div>
+  </div>
+
+  <!-- ── FLOATING HEADER ── -->
+  <header class="floating-header">
+    <a href="#" class="header-logo">
+      <span class="logo-f1">F1</span>
+      <span class="logo-predict">PREDICT</span>
+      <span class="logo-badge">2026</span>
+    </a>
+    <a href="/dashboard/" class="dashboard-btn">Launch Dashboard</a>
+  </header>
+
+  <!-- ── THREE.JS WEBGL CANVAS ── -->
+  <canvas id="webgl"></canvas>
+
+  <!-- ── SCROLL OVERLAY SECTIONS ── -->
+  <div class="scroll-container">
+
+    <!-- Section 1: Hero -->
+    <section class="scroll-section section-center">
+      <div class="content-card reveal" id="sec-hero">
+        <div class="card-label">THE 2026 SEASON</div>
+        <h2 class="card-title">Say <span class="italic-emphasis">hello</span> to <strong>F1 Predict</strong></h2>
+        <p class="card-desc">
+          Telemetry-driven Formula 1 race predictions. We simulate race conditions, qualifying results, and DNF probabilities to calculate exactly who wins Sunday.
+        </p>
+        <div class="card-desc" style="font-size: 11px; color: #70707c;">
+          Scroll to explore the machine learning architecture.
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Model Accuracy -->
+    <section class="scroll-section section-left">
+      <div class="content-card reveal" id="sec-stats">
+        <div class="card-label">ACCURACY RECORD</div>
+        <h2 class="card-title">Engineered to <span class="italic-emphasis">predict</span></h2>
+        <p class="card-desc">
+          No guesses. F1 Predict runs advanced XGBoost regressor models trained on 14 seasons of historical racing variables to call race outcomes with extreme precision.
+        </p>
+        <div class="telemetry-row">
+          <div class="telemetry-stat">
+            <span class="stat-val" id="landing-winners-called">5 / 6</span>
+            <span class="stat-lbl">Winners Called</span>
+          </div>
+          <div class="telemetry-stat">
+            <span class="stat-val" id="landing-average-mae">4.37</span>
+            <span class="stat-lbl">Average MAE</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: The Blending Formula -->
+    <section class="scroll-section section-right">
+      <div class="content-card reveal" id="sec-blend">
+        <div class="card-label">PREDICTOR PIPELINE</div>
+        <h2 class="card-title">Mathematical <span class="italic-emphasis">blending</span></h2>
+        <p class="card-desc">
+          We combine constructor strengths, grid penalties, safety car simulations, and weather probabilities. The final predicted order is ranked by a blended score balancing classifier wins and regressed grid placement.
+        </p>
+        <div class="telemetry-row">
+          <div class="telemetry-stat">
+            <span class="stat-val">0.6 &times; REG</span>
+            <span class="stat-lbl">Grid weighting</span>
+          </div>
+          <div class="telemetry-stat">
+            <span class="stat-val">0.4 &times; CLS</span>
+            <span class="stat-lbl">Winner classifier</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Technical Curiosities -->
+    <section class="scroll-section section-left">
+      <div class="content-card reveal" id="sec-technical">
+        <div class="card-label">NERD ZONE</div>
+        <h2 class="card-title">Built for the <span class="italic-emphasis">curious</span></h2>
+        <p class="card-desc">
+          Our model reports feature importance, cross-validation metrics, OpenF1 and FastF1 live API sources, and known technical limitations transparently in our developer panel.
+        </p>
+        <div class="telemetry-row">
+          <div class="telemetry-stat">
+            <span class="stat-val">FastF1</span>
+            <span class="stat-lbl">Telemetry source</span>
+          </div>
+          <div class="telemetry-stat">
+            <span class="stat-val">scikit-learn</span>
+            <span class="stat-lbl">ML Framework</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Call to Action -->
+    <section class="scroll-section section-center">
+      <div class="content-card reveal" id="sec-cta">
+        <div class="card-label">RACE IS ON</div>
+        <h2 class="card-title">Who stands <span class="italic-emphasis">atop</span> of the <strong>podium</strong> next?</h2>
+        <p class="card-desc">
+          Explore podium predictions, win probabilities, safety car weather projections, and model details directly in our interactive grid dashboard.
+        </p>
+        <a href="/dashboard/" class="dashboard-btn">Enter Dashboard</a>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Three.js Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- GLTFLoader CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <!-- App JS -->
+  <script src="app.js"></script>
+</body>
+</html>

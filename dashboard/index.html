@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>F1 Predict — 2026 Season Predictions</title>
+  <meta name="description" content="Telemetry-driven Formula 1 race predictions for 2026. Who wins Sunday? Podium picks, win probabilities, and reliability risk for every driver." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,300;1,400;1,500;1,600&family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div class="app-layout">
+
+    <!-- ══════════════════════════════════════════════════════ SIDEBAR -->
+    <aside class="app-sidebar">
+      <div class="sidebar-top">
+        <a href="/" class="logo">
+          <span class="logo-f1">F1</span>
+          <span class="logo-predict">PREDICT</span>
+          <span class="logo-badge">2026</span>
+        </a>
+
+        <div class="mode-toggle" id="modeToggle" title="Switch between Pre-race and Post-race view">
+          <button class="mode-btn active" id="btnPreRace" data-mode="pre">Pre-Race</button>
+          <button class="mode-btn" id="btnPostRace" data-mode="post">Post-Race</button>
+        </div>
+      </div>
+
+      <div class="sidebar-nav">
+        <div class="sidebar-section-label">Races</div>
+        <nav class="race-list" id="raceList" aria-label="Race selector">
+          <!-- Populated by JS -->
+        </nav>
+      </div>
+
+      <div class="sidebar-bottom">
+        <button class="sidebar-btn-nerd" id="sidebarNerdToggle" onclick="app.toggleNerdZone()" aria-expanded="false">
+          <span class="nerd-label-text">Model Details</span>
+          <span class="nerd-arrow" id="sidebarNerdArrow">▼</span>
+        </button>
+
+        <div class="sidebar-footer">
+          <div class="footer-line">F1 Predict &middot; 2026 Season</div>
+          <div class="footer-disclaimer">Predictions for entertainment only.</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══════════════════════════════════════════════════════ MAIN AREA -->
+    <div class="app-main">
+
+      <!-- Top Action Bar -->
+      <header class="app-header">
+        <div class="breadcrumbs">
+          <span class="breadcrumb-parent">Races</span>
+          <span class="breadcrumb-separator">/</span>
+          <h1 class="breadcrumb-active" id="activeRaceTitle">Loading...</h1>
+        </div>
+
+        <div class="header-share-actions">
+          <button class="share-btn" id="btnCopyText" onclick="app.shareCopyText()">Copy Prediction</button>
+          <button class="share-btn share-btn-primary" id="btnCopyImage" onclick="app.shareGenerateImage()">Copy as Image</button>
+        </div>
+      </header>
+
+      <main class="main-content" id="mainContent">
+
+        <!-- ── LOADING STATE ── -->
+        <div class="loading-state" id="loadingState">
+          <div class="loading-spinner"></div>
+          <p>Loading predictions…</p>
+        </div>
+
+        <!-- ── ERROR STATE ── -->
+        <div class="error-state hidden" id="errorState">
+          <div class="error-icon">Error</div>
+          <h2>Could not load prediction data</h2>
+          <p>Make sure <code>race_results.json</code> is in the same folder as this page, then refresh.</p>
+          <p class="error-hint">Run <code>python Main_Prediction_Script/pred_advanced.py --dashboard</code> to generate the data file.</p>
+        </div>
+
+        <!-- ── DASHBOARD CONTENT (hidden until data loads) ── -->
+        <div class="dashboard hidden" id="dashboard">
+
+          <!-- ─── KPI METRIC ROW (Podium + Forecast) ─── -->
+          <section class="kpi-grid" id="kpiGrid">
+            <!-- 4 cards: P1, P2, P3, and Forecast. Populated by JS -->
+          </section>
+
+          <!-- ─── DNF WATCH ─── -->
+          <div class="dnf-watch hidden" id="dnfWatch">
+            <span class="dnf-label">DNF Watch</span>
+            <div class="dnf-drivers" id="dnfDrivers"><!-- populated by JS --></div>
+            <span class="dnf-hint">Drivers most likely to retire — avoid for fantasy picks</span>
+          </div>
+
+          <!-- ─── MAIN COLUMN LAYOUT ─── -->
+          <div class="dashboard-grid">
+
+            <!-- Full Grid Section -->
+            <section class="section grid-section">
+              <div class="section-header">
+                <h2 class="section-title">Full Grid Prediction</h2>
+                <div class="grid-controls">
+                  <button class="ctrl-btn active" id="sortByPredicted" onclick="app.setSortMode('predicted')">Our Prediction</button>
+                  <button class="ctrl-btn" id="sortByActual" onclick="app.setSortMode('actual')">Actual Result</button>
+                </div>
+              </div>
+
+              <div class="grid-table-wrap">
+                <table class="grid-table" id="gridTable">
+                  <thead>
+                    <tr>
+                      <th class="col-pos">Pos</th>
+                      <th class="col-driver">Driver</th>
+                      <th class="col-win">Win Chance</th>
+                      <th class="col-dnf">DNF Risk</th>
+                      <th class="col-actual hidden" id="thActual">Actual</th>
+                      <th class="col-acc hidden" id="thAcc">Result</th>
+                    </tr>
+                  </thead>
+                  <tbody id="gridBody">
+                    <!-- populated by JS -->
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Side Panel: Track Record + Season Trend -->
+            <div class="side-panel">
+
+              <!-- Track Record -->
+              <section class="section track-record-section">
+                <h2 class="section-title">Our Track Record</h2>
+                <div class="track-record-content" id="trackRecord">
+                  <!-- populated by JS -->
+                </div>
+                <div class="winner-streak" id="winnerStreak">
+                  <!-- populated by JS -->
+                </div>
+              </section>
+
+              <!-- Season Accuracy Trend -->
+              <section class="section trend-section">
+                <h2 class="section-title">Season Accuracy Trend</h2>
+                <div class="chart-wrap">
+                  <canvas id="trendChart" width="400" height="180"></canvas>
+                </div>
+              </section>
+
+            </div><!-- /.side-panel -->
+
+          </div><!-- /.dashboard-grid -->
+
+          <!-- ─── COLLAPSIBLE NERD ZONE ─── -->
+          <section class="section nerd-zone-section" id="nerdZoneSection">
+            <button class="nerd-toggle" id="nerdToggle" onclick="app.toggleNerdZone()" aria-expanded="false">
+              <span class="nerd-label">Model Details — for the technically curious</span>
+              <span class="nerd-arrow" id="nerdArrow">▼</span>
+            </button>
+
+            <div class="nerd-content hidden" id="nerdContent">
+              
+              <!-- Tab Navigation Header -->
+              <div class="nerd-tabs-header">
+                <button class="nerd-tab-btn active" id="nerdTabBtn-pipeline" onclick="app.showNerdTab('pipeline', this)">Pipeline & Arch</button>
+                <button class="nerd-tab-btn" id="nerdTabBtn-features" onclick="app.showNerdTab('features', this)">Feature Engineering</button>
+                <button class="nerd-tab-btn" id="nerdTabBtn-validation" onclick="app.showNerdTab('validation', this)">Validation & Training</button>
+                <button class="nerd-tab-btn" id="nerdTabBtn-tech" onclick="app.showNerdTab('tech', this)">Data & Tech Stack</button>
+              </div>
+
+              <!-- Tab 1: Pipeline & Architecture -->
+              <div class="nerd-tab-pane" id="nerdTab-pipeline">
+                <div class="tech-insight-card">
+                  <h4>Architectural Design: Multi-Stage Blending Pipeline</h4>
+                  <p>
+                    Rather than predicting winners using simple historical averages, this system builds a multi-stage regressor and classifier pipeline. Position regression is combined with raw win probabilities, dynamically penalized by mechanical and weather-based DNF risks to call the final order.
+                  </p>
+                </div>
+                
+                <div class="nerd-row-layout">
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Model Components</h3>
+                    <div class="model-arch" id="modelArch"><!-- populated by JS --></div>
+                  </div>
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Blending Formula & Logic</h3>
+                    <div class="formula-box" id="formulaBox"><!-- populated by JS --></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 2: Feature Engineering -->
+              <div class="nerd-tab-pane hidden" id="nerdTab-features">
+                <div class="tech-insight-card">
+                  <h4>Feature Engineering: Domain-Specific Extraction</h4>
+                  <p>
+                    A model is only as good as its features. This pipeline extracts dynamic in-season form coefficients (constructor point momentum), historical track affinity indicators (14 years of driver/constructor finishes per circuit), live weather probability metrics, and FP2/FP1 practice lap pacing to capture real-time driver performance.
+                  </p>
+                </div>
+
+                <div class="nerd-block">
+                  <h3 class="nerd-heading">Feature Importance</h3>
+                  <div class="feat-tabs">
+                    <button class="feat-tab active" onclick="app.showFeatTab('reg', this)">Position Model</button>
+                    <button class="feat-tab" onclick="app.showFeatTab('win', this)">Winner Model</button>
+                    <button class="feat-tab" onclick="app.showFeatTab('dnf', this)">DNF Model</button>
+                  </div>
+                  <div class="feat-chart-wrap">
+                    <canvas id="featChart" width="600" height="320"></canvas>
+                  </div>
+                  <div class="feat-descriptions" id="featDescriptions"><!-- populated by JS --></div>
+                </div>
+
+                <div class="nerd-block">
+                  <h3 class="nerd-heading">Feature Engineering Definitions</h3>
+                  <div class="feat-table-wrap" id="featTable"><!-- populated by JS --></div>
+                </div>
+              </div>
+
+              <!-- Tab 3: Validation & Training -->
+              <div class="nerd-tab-pane hidden" id="nerdTab-validation">
+                <div class="tech-insight-card">
+                  <h4>Validation Strategy: Leakage Prevention & Validation</h4>
+                  <p>
+                    Standard random cross-validation splits fail in F1 telemetry: lap times and constructor conditions from a single race weekend will leak from the validation fold into the training folds, inflating model accuracy. We use **GroupKFold (grouped by race round)** to test models exclusively on complete, unseen weekends, assuring valid real-world generalization.
+                  </p>
+                </div>
+
+                <div class="nerd-row-layout">
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Training & Validation Summary</h3>
+                    <div class="cv-info" id="cvInfo"><!-- populated by JS --></div>
+                  </div>
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Accuracy Metrics (Historical & Live)</h3>
+                    <div class="accuracy-table-wrap" id="accuracyTable"><!-- populated by JS --></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tab 4: Data & Tech Stack -->
+              <div class="nerd-tab-pane hidden" id="nerdTab-tech">
+                <div class="tech-insight-card">
+                  <h4>Data Orchestration: API Reliability & Orchestration</h4>
+                  <p>
+                    Our data pipeline orchestrates live session APIs (FastF1, OpenF1, Jolpica) with resilient request handling and exponential backoff retry mechanisms. By mapping hardware failures, tire degradation rates, and weather conditions, we build a highly reliable technical predictive backend.
+                  </p>
+                </div>
+
+                <div class="nerd-block">
+                  <h3 class="nerd-heading">API Data Sources</h3>
+                  <div class="sources-grid" id="sourcesGrid"><!-- populated by JS --></div>
+                </div>
+
+                <div class="nerd-row-layout">
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Skills & Tech Stack</h3>
+                    <div class="tech-stack-container">
+                      <div class="tech-stack-row">
+                        <div class="tech-domain-label">Predictive Modeling & ML</div>
+                        <div class="tech-domain-chips">
+                          <span class="tech-chip">scikit-learn 1.4</span>
+                          <span class="tech-chip">GradientBoostingRegressor</span>
+                          <span class="tech-chip">GradientBoostingClassifier</span>
+                          <span class="tech-chip">XGBoost Baseline</span>
+                          <span class="tech-chip">Hyperparameter Optimization</span>
+                          <span class="tech-chip">Overfitting Mitigation</span>
+                          <span class="tech-chip">Feature Selection & Importance</span>
+                        </div>
+                      </div>
+                      <div class="tech-stack-row">
+                        <div class="tech-domain-label">ML Pipeline Orchestration</div>
+                        <div class="tech-domain-chips">
+                          <span class="tech-chip">Agentic Planning Loops</span>
+                          <span class="tech-chip">Tool Use & Callback Triggers</span>
+                          <span class="tech-chip">State Machines</span>
+                          <span class="tech-chip">Background Task Queues</span>
+                          <span class="tech-chip">Subagent Execution Chains</span>
+                        </div>
+                      </div>
+                      <div class="tech-stack-row">
+                        <div class="tech-domain-label">Backend & Data Engineering</div>
+                        <div class="tech-domain-chips">
+                          <span class="tech-chip">Python 3.11</span>
+                          <span class="tech-chip">FastF1 Telemetry Processing</span>
+                          <span class="tech-chip">OpenF1 Real-Time LAP Feeds</span>
+                          <span class="tech-chip">Jolpica Ergast-API Client</span>
+                          <span class="tech-chip">Joblib Cache Directory</span>
+                          <span class="tech-chip">Exponential-Backoff Backends</span>
+                          <span class="tech-chip">Fault-Tolerant Request Orchestrations</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="nerd-block">
+                    <h3 class="nerd-heading">Known Model Limitations</h3>
+                    <div class="limitations" id="limitations"><!-- populated by JS --></div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </section>
+
+          <!-- Toast notification for Copy actions -->
+          <div class="share-toast hidden" id="shareToast">Copied to clipboard!</div>
+
+        </div><!-- /.dashboard -->
+
+      </main>
+
+    </div><!-- /.app-main -->
+
+  </div><!-- /.app-layout -->
+
+  <!-- ══════════════════════════════════════════════════════ SHARE PREVIEW (off-screen) -->
+  <div class="share-preview-wrapper" style="position:fixed;left:-9999px;top:-9999px;">
+    <div class="share-preview" id="sharePreview">
+      <!-- preview card populated by JS -->
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════ SHARE CANVAS (off-screen) -->
+  <canvas id="shareCanvas" width="600" height="340" style="position:fixed;left:-9999px;top:-9999px;"></canvas>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <!-- html2canvas for share image -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

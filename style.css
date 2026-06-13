@@ -1,0 +1,280 @@
+/* ══════════════════════════════════════════════════════════════════
+   F1 PREDICT LANDING PAGE — style.css
+   Style reference: Premium Minimal WebGL Showcase (oryzo-inspired)
+   Palette: Carbon Black #050508 · Paper White #ffffff · Muted Grays
+   ════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #050508;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── WebGL Canvas ── */
+#webgl {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+  pointer-events: none; /* Let clicks pass through to overlays */
+}
+
+/* ── Loading Overlay ── */
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #050508;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.5s ease;
+}
+.loading-overlay.hidden {
+  display: none !important;
+  pointer-events: none;
+}
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 16px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-text {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #a8a8b8;
+}
+
+/* ── Floating Header ── */
+.floating-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+}
+.logo-f1 {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+}
+.logo-predict {
+  font-family: 'Outfit', sans-serif;
+  font-weight: 300;
+  font-size: 13px;
+  color: #ffffff;
+  letter-spacing: 2px;
+}
+.logo-badge {
+  font-family: 'Outfit', sans-serif;
+  font-size: 8px;
+  font-weight: 700;
+  color: #050508;
+  background: #ffffff;
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+.dashboard-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Outfit', sans-serif;
+  background: #ffffff;
+  color: #050508;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  padding: 10px 22px;
+  border-radius: 30px;
+  text-decoration: none;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.dashboard-btn:hover {
+  background: #050508;
+  color: #dfba73;
+  border-color: #dfba73;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(223, 186, 115, 0.25);
+}
+.dashboard-btn:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* ── Scroll Container & Sections ── */
+.scroll-container {
+  position: relative;
+  width: 100vw;
+  z-index: 2;
+  pointer-events: none; /* Clicks pass through */
+}
+.scroll-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 40px 10%;
+  box-sizing: border-box;
+}
+
+/* Align text overlays differently per section for dynamic pacing */
+.section-center { justify-content: center; text-align: center; }
+.section-left { justify-content: flex-start; text-align: left; }
+.section-right { justify-content: flex-end; text-align: left; }
+
+/* ── Content Card Overlay ── */
+.content-card {
+  max-width: 460px;
+  background: rgba(10, 10, 12, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 32px;
+  pointer-events: auto; /* Re-enable clicks inside cards */
+}
+.section-center .content-card {
+  max-width: 580px;
+}
+
+/* Typography details */
+.card-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #a8a8b8;
+  margin-bottom: 12px;
+}
+.card-title {
+  font-family: 'Outfit', sans-serif;
+  font-size: 32px;
+  font-weight: 300;
+  line-height: 1.15;
+  color: #ffffff;
+  margin-bottom: 16px;
+  letter-spacing: -0.6px;
+}
+.card-title strong {
+  font-weight: 600;
+}
+.card-desc {
+  font-size: 14px;
+  color: #a8a8b8;
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+/* Creative italic cursive words for emphasis */
+.italic-emphasis {
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  font-weight: 400;
+  text-transform: lowercase;
+  color: #dfba73; /* Warm gold */
+  font-size: 1.12em;
+  line-height: 0.9;
+  padding-right: 4px;
+  padding-left: 2px;
+  display: inline-block;
+  letter-spacing: normal;
+}
+
+/* Unified action buttons via .dashboard-btn */
+
+/* Telemetry stat indicators */
+.telemetry-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+.telemetry-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+}
+.stat-val {
+  font-family: 'Outfit', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #ffffff;
+}
+.stat-lbl {
+  font-size: 9px;
+  font-weight: 600;
+  color: #70707c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+/* ── Scroll Reveal System ── */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+              transform 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Responsive details */
+@media (max-width: 768px) {
+  .floating-header {
+    padding: 15px 20px;
+  }
+  .scroll-section {
+    padding: 40px 20px;
+    justify-content: center;
+    text-align: center;
+  }
+  .content-card {
+    max-width: 100% !important;
+    padding: 24px;
+  }
+  .card-title {
+    font-size: 26px;
+  }
+}

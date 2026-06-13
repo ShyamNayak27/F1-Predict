@@ -1,0 +1,32 @@
+{
+  "builds": [
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "app.js",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "style.css",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "f1_car.glb",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "race_results.json",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "extracted/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "dashboard/**",
+      "use": "@vercel/static"
+    }
+  ]
+}

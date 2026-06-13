@@ -1,3 +1,4 @@
+# Security Reconfirmation: .env files are strictly ignored and inaccessible in git
 .env
 __pycache__/
 *.pyc

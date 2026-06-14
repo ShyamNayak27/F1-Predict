@@ -46,15 +46,63 @@ fastf1.Cache.enable_cache("cache/")
 HISTORICAL_CACHE = "model/historical_data.joblib"
 ENRICHED_CACHE = "model/enriched_data.joblib"
 
-ROUNDS = [1, 2, 3, 4, 5, 6]
-RACE_NAMES = {
-    1: "Australian GP",
-    2: "Chinese GP",
-    3: "Japanese GP",
-    4: "Miami GP",
-    5: "Canadian GP",
-    6: "Monaco GP",
-}
+# ---------------------------------------------------------------------------
+# Dynamic round discovery — automatically picks up every completed race
+# so the dashboard never needs a manual ROUNDS/RACE_NAMES update.
+# ---------------------------------------------------------------------------
+
+def get_completed_rounds(season: int) -> tuple[list[int], dict[int, str]]:
+    """
+    Query the Jolpica calendar for `season` and return:
+      - rounds: list of round numbers whose race has already occurred (UTC)
+      - race_names: dict mapping round_number -> short GP name
+    Falls back to the last known hardcoded list on API failure.
+    """
+    import datetime, pytz, requests as _req
+    url = f"{JOLPICA_BASE}/{season}.json"
+    now_utc = datetime.datetime.now(pytz.utc)
+    try:
+        resp = _req.get(url, timeout=10)
+        resp.raise_for_status()
+        races = resp.json()["MRData"]["RaceTable"]["Races"]
+    except Exception as e:
+        print(f"[WARNING] [calendar] Could not fetch {season} calendar: {e}. Using fallback round list.")
+        # Hardcoded fallback covers the first 7 rounds of 2026
+        fallback_names = {
+            1: "Australian GP", 2: "Chinese GP", 3: "Japanese GP",
+            4: "Miami GP",      5: "Canadian GP", 6: "Monaco GP",
+            7: "Barcelona GP",
+        }
+        return list(fallback_names.keys()), fallback_names
+
+    rounds, race_names = [], {}
+    for race in races:
+        rnd = int(race["round"])
+        date_str = race["date"]
+        time_str = race.get("time", "00:00:00").rstrip("Z")
+        try:
+            import datetime as _dt
+            race_dt = _dt.datetime.fromisoformat(f"{date_str}T{time_str}").replace(tzinfo=pytz.utc)
+        except Exception:
+            continue
+        if race_dt <= now_utc:  # race has started/finished
+            rounds.append(rnd)
+            # Shorten e.g. "Australian Grand Prix" -> "Australian GP"
+            raw_name = race["raceName"]
+            short = raw_name.replace("Grand Prix", "GP")
+            race_names[rnd] = short
+
+    if not rounds:
+        print("[WARNING] No completed rounds found in calendar — using fallback.")
+        fallback_names = {
+            1: "Australian GP", 2: "Chinese GP", 3: "Japanese GP",
+            4: "Miami GP",      5: "Canadian GP", 6: "Monaco GP",
+            7: "Barcelona GP",
+        }
+        return list(fallback_names.keys()), fallback_names
+
+    print(f"  [calendar] Found {len(rounds)} completed rounds in {season}: {rounds}")
+    return sorted(rounds), race_names
 
 CONSTRUCTOR_COLORS = {
     "alpine":    "#0093CC",
@@ -470,15 +518,15 @@ def run_prediction_for_round(
     advanced_features: list,
     current_season: int
 ) -> dict | None:
-    print(f"\n============================================================")
-    print(f"  Round {round_num}: {RACE_NAMES.get(round_num, f'Round {round_num}')}")
-    print(f"============================================================")
-
     race_info = get_next_race(current_season, round_num)
     if race_info is None:
         print(f"  [ERROR] Race info not found for round {round_num}")
         return None
     circuit_id = race_info["circuit_id"]
+    _display_name = race_info.get("race_name", f"Round {round_num}").replace("Grand Prix", "GP")
+    print(f"\n============================================================")
+    print(f"  Round {round_num}: {_display_name}")
+    print(f"============================================================")
 
     # Fetch in-season results
     print(f"  [standings] Fetching in-season results (rounds 1-{round_num-1})...")
@@ -563,9 +611,12 @@ def run_prediction_for_round(
 
     metrics = compute_metrics(live_features, actual_df) if actual_df is not None else {}
 
+    # Derive race name directly from calendar API (race_info already fetched above)
+    _race_name = race_info.get("race_name", f"Round {round_num}").replace("Grand Prix", "GP")
+
     return {
         "round":        round_num,
-        "race_name":    RACE_NAMES.get(round_num, f"Round {round_num}"),
+        "race_name":    _race_name,
         "circuit_id":   circuit_id,
         "predictions":  live_features.sort_values("final_predicted_pos"),
         "actual":       actual_df,
@@ -904,6 +955,10 @@ def main():
         y_dnf = train_clean["status"].apply(lambda s: any(kw.lower() in str(s).lower() for kw in DNF_STATUS_KEYWORDS)).astype(int)
         model_dnf = GradientBoostingClassifier(n_estimators=200, max_depth=3, learning_rate=0.05, random_state=42)
         model_dnf.fit(X_adv, y_dnf)
+
+        # Dynamically discover all completed rounds from the live calendar
+        ROUNDS, RACE_NAMES = get_completed_rounds(current_season)
+        print(f"\nDashboard will process {len(ROUNDS)} completed rounds: {ROUNDS}")
 
         results = []
         for rnd in ROUNDS:
